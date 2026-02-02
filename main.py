@@ -13,7 +13,7 @@ def main():
     output_file = sys.argv[2]
     
     with open(schema_file, "r") as f:
-        schema = json.load(f)
+        schema = json.load(f) #schema from file in folder as schema.json
 
     data = generate_row(schema)
     export_to_csv(data, output_file)

@@ -1,6 +1,6 @@
 {
     "table_name": "users",
-    "rows": 10000,
+    "rows": 10,
     "columns": [
         {
             "name": "id",

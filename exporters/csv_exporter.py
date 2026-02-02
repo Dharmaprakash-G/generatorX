@@ -1,5 +1,9 @@
+import io
 import pandas as pd 
 
-def export_to_csv(data, output_file):
+def generate_csv_string(data):
     df = pd.DataFrame(data)
-    df.to_csv(output_file, index = False)
+    buffer = io.StringIO()
+    df.to_csv(buffer,index = False)
+    buffer.seek(0)
+    return buffer 
