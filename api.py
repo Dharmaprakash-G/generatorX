@@ -1,9 +1,9 @@
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, HTTPException
 from fastapi.responses import StreamingResponse
 
-from generator.engine import generate_row
+from generator.engine import generate_data
 from exporters.csv_exporter import generate_csv_string
-
+from schemas.schema_models import TableSchema
 
 
 app = FastAPI(
@@ -14,10 +14,14 @@ app = FastAPI(
 
 
 @app.post("/generate")
-def generate_dummy_data(schema: dict = Body(...)): #schema from fastapi as json, FastAPI converts JSON → Python dict
-    data = generate_row(schema)
+def generate_dummy_data(schema: TableSchema): #schema from fastapi as json, FastAPI converts JSON → Python dict
+    try:
+        data = generate_data(schema.dict())
+    except ValueError as e:
+        raise HTTPException(status_code = 422, detail = str(e))
+    
     return {
-        "table" : schema.get("table_name"),
+        "table" : schema.table_name,
         "count" : len(data),
         "rows" : data
     }   
@@ -25,12 +29,15 @@ def generate_dummy_data(schema: dict = Body(...)): #schema from fastapi as json,
 
 
 @app.post("/generate/csv")
-def generate_csv(schema: dict = Body(...)):
-    data = generate_row(schema)
+def generate_csv(schema: TableSchema):
+    try:
+        data = generate_data(schema.dict())
+    except ValueError as e:
+        raise HTTPException(status_code = 422, detail = str(e))
 
     csv_buffer = generate_csv_string(data)
 
-    filename = f"{schema.get('table_name', 'data')}.csv"
+    filename = f"{schema.table_name}.csv"
 
     return StreamingResponse(
         csv_buffer,

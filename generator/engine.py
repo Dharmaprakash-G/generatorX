@@ -1,6 +1,6 @@
 from generator.types import generate_value 
 
-def generate_row(schema):
+def generate_data(schema):
     rows = schema["rows"]
     columns = schema["columns"]
 
