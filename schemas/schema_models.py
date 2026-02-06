@@ -20,8 +20,6 @@ class RefSchema(BaseModel):
     column: str
 
 
-
-
 class ColumnSchema(BaseModel):
     name: str
     type: ColumnType
@@ -71,6 +69,7 @@ class TableSchema(BaseModel):
             raise ValueError("columns list must not be empty")
 
         return v
+        
 
 class DatasetSchema(BaseModel):
     tables: List[TableSchema]

@@ -1,9 +1,16 @@
 import io
-import pandas as pd 
+import csv
 
-def generate_csv_string(data):
-    df = pd.DataFrame(data)
+def table_to_csv_buffer(rows : list[dict]) -> io.StringIO:
     buffer = io.StringIO()
-    df.to_csv(buffer,index = False)
+
+    if not rows:
+        return buffer
+
+    writer = csv.DictWriter(buffer, fieldnames = rows[0].keys())
+    writer.writeheader()
+    writer.writerows(rows)
+
     buffer.seek(0)
-    return buffer 
+    return buffer
+     
