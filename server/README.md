@@ -22,7 +22,7 @@ pip install -r requirements.txt
 ### Start the API Server
 
 ```bash
-uvicorn api:app --reload
+uvicorn app:app --reload
 ```
 
 The server starts at **http://127.0.0.1:8000**.
@@ -40,7 +40,7 @@ python main.py schema.json output.csv
 
 ```
 server/
-├── api.py                         → FastAPI app & REST endpoints
+├── app.py                         → FastAPI app & REST endpoints
 ├── main.py                        → CLI entry point (single-table mode)
 ├── requirements.txt               → Python dependencies
 ├── schema.json                    → Example single-table schema

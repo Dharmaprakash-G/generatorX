@@ -28,7 +28,7 @@ generatorX/
 │       └── types/                  → TypeScript interfaces & enums
 │
 └── server/          → Python + FastAPI
-    ├── api.py                      → REST endpoints
+    ├── app.py                      → REST endpoints
     ├── main.py                     → CLI entry point
     ├── generator/
     │   ├── engine.py               → Core generation logic
@@ -65,7 +65,7 @@ python -m venv venv
 venv\Scripts\activate        # Windows
 # source venv/bin/activate   # macOS / Linux
 pip install -r requirements.txt
-uvicorn api:app --reload
+uvicorn app:app --reload
 ```
 
 The API server starts at **http://127.0.0.1:8000**. Interactive docs are available at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
