@@ -1,6 +1,7 @@
 import json
 import sys
 
+from api import app  # FastAPI entrypoint for deployment platforms
 from generator.engine import generate_row
 from exporters.csv_exporter import export_to_csv
 
