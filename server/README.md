@@ -1,5 +1,11 @@
 # GeneratorX — Server
 
+![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
+![Pydantic](https://img.shields.io/badge/Pydantic-E92063?logo=pydantic&logoColor=white)
+![Faker](https://img.shields.io/badge/Faker-Data_Generation-blue)
+![Google Gemini](https://img.shields.io/badge/Google_Gemini-AI-4285F4?logo=google&logoColor=white)
+
 The backend for GeneratorX, built with **Python**, **FastAPI**, **Pydantic**, and **Faker**.
 
 ---

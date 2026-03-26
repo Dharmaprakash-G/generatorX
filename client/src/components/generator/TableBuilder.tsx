@@ -177,21 +177,6 @@ function TableBuilder({ tables, setTables }: Props) {
                         >
                             <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
 
-                                {/* Column Name */}
-                                <input
-                                    placeholder="Column Name"
-                                    value={column.name}
-                                    onChange={(e) =>
-                                        updateColumn(
-                                            table.id,
-                                            column.id,
-                                            "name",
-                                            e.target.value
-                                        )
-                                    }
-                                    className="border border-gray-300 rounded-lg p-2"
-                                />
-
                                 {/* Type */}
                                 <select
                                     value={column.type}
@@ -211,6 +196,21 @@ function TableBuilder({ tables, setTables }: Props) {
                                         </option>
                                     ))}
                                 </select>
+                                {/* Column Name */}
+                                <input
+                                    placeholder="Column Name"
+                                    value={column.name}
+                                    onChange={(e) =>
+                                        updateColumn(
+                                            table.id,
+                                            column.id,
+                                            "name",
+                                            e.target.value
+                                        )
+                                    }
+                                    className="border border-gray-300 rounded-lg p-2"
+                                />
+
 
                                 {/* Min / Max only for int */}
                                 {column.type === "int" && (

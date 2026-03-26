@@ -63,22 +63,5 @@ def generate_zip(schema: DatasetSchema):
     )
 
 
-# @app.post("/generate/csv")
-# def generate_csv(schema: DatasetSchema):
-#     try:
-#         data = generate_dataset(schema.dict())
-#     except ValueError as e:
-#         raise HTTPException(status_code = 422, detail = str(e))
 
-#     csv_buffer = generate_csv_string(data)
-
-#     filename = f"{schema.table_name}.csv"
-
-#     return StreamingResponse(
-#         csv_buffer,
-#         media_type = "text/csv",
-#         headers = {
-#             "Content-Disposition": f"attachment; filename = {filename}"
-#         }
-#     )
    
