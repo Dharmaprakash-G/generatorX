@@ -26,3 +26,12 @@ export interface GenerateRequest {
     tables: Table[];
 }
 
+export type ExportFormat = "csv" | "json" | "sql";
+
+export interface ChatMessage {
+    id: string;
+    role: "user" | "ai";
+    content: string;
+    schema?: Table[];
+}
+

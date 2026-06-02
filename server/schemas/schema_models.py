@@ -43,22 +43,21 @@ class ColumnSchema(BaseModel):
     ref: Optional[RefSchema] = None
 
     @validator("name")
-    def name_must_not_ne_empty(cls, v):
+    def name_must_not_be_empty(cls, v):
         if not v.strip():
-            raise ValueError("column nmae must not be empty")
+            raise ValueError("column name must not be empty")
         return v
 
+    @root_validator(skip_on_failure=True)
+    def check_min_max(cls, values):
+        min_val = values.get("min")
+        max_val = values.get("max")
 
-        @root_validator
-        def check_min_max(cls,values):
-            min_val = values.get("min")
-            max_val = values.get("max")
+        if min_val is not None and max_val is not None:
+            if min_val > max_val:
+                raise ValueError("min must be less than max")
 
-            if min_val is not None and max_val is not None:
-                if min_val > max_val:
-                    raise ValueError("min must be less than max")
-
-            return values
+        return values
 
 
 
@@ -91,34 +90,34 @@ class DatasetSchema(BaseModel):
             raise ValueError("dataset must contain at least one table")
         return v
 
-        @root_validator
-        def validate_references(cls, values):
-            tables = values.get("tables", [])
+    @root_validator(skip_on_failure=True)
+    def validate_references(cls, values):
+        tables = values.get("tables", [])
 
-            table_map = {
-                tables.table_name:table
-                for table in tables
-            }
+        table_map = {
+            table.table_name: table
+            for table in tables
+        }
 
-            for table in tables:
-                for column in table.columns:
-                    if column.ref:
-                        ref_table = column.ref.table
-                        ref_column = column.ref.column
+        for table in tables:
+            for column in table.columns:
+                if column.ref:
+                    ref_table = column.ref.table
+                    ref_column = column.ref.column
 
-                        if ref_table not in table_map:
-                            raise ValueError(
-                                f"Table '{table.table_name}' references unknown table '{ref_table}'"
-                            )
+                    if ref_table not in table_map:
+                        raise ValueError(
+                            f"Table '{table.table_name}' references unknown table '{ref_table}'"
+                        )
 
-                        parent_columns = {
-                            col.name for col in table_map[ref_table].columns
-                        }
+                    parent_columns = {
+                        col.name for col in table_map[ref_table].columns
+                    }
 
-                        if ref_column not in parent_columns:
-                            raise ValueError(
-                                f"Table '{table.table_name}' references unknown column "
-                                f"'{ref_column}' in table '{ref_table}'"
-                            )
+                    if ref_column not in parent_columns:
+                        raise ValueError(
+                            f"Table '{table.table_name}' references unknown column "
+                            f"'{ref_column}' in table '{ref_table}'"
+                        )
 
-            return values
+        return values

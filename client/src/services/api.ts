@@ -21,3 +21,19 @@ export async function generateData(data: any): Promise<Blob> {
 
 }
 
+export async function generateAISchema(prompt: string){
+    const response = await fetch(`${API_BASE_URL}/generate/ai-schema`,{
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({prompt}),
+    });
+
+    if(!response.ok){
+        const error = await response.json();
+        throw new Error(JSON.stringify(error));
+    }
+
+    return await response.json();
+
+}
+

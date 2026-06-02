@@ -1,10 +1,12 @@
 from fastapi import FastAPI, Body, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 from generator.engine import generate_dataset
 from schemas.schema_models import DatasetSchema
 from exporters.zip_exporter import dataset_to_zip
+from ai.schema_generator import generate_schema_from_promt
 
 
 app = FastAPI(
@@ -22,6 +24,8 @@ app.add_middleware(
 )
 
 
+class AISchemaRequest(BaseModel):
+    prompt: str
 
 
 @app.get("/")
@@ -62,6 +66,14 @@ def generate_zip(schema: DatasetSchema):
         }
     )
 
+@app.post("/generate/ai-schema")
+def generate_ai_schema(body: AISchemaRequest):
+    try:
+        schema = generate_schema_from_promt(body.prompt)
+        return schema
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
+        
 
    

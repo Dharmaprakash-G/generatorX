@@ -1,1 +1,110 @@
 @import "tailwindcss";
+
+@theme {
+  /* Backgrounds */
+  --color-base: #0b0f12; /* Deep slate/obsidian */
+  --color-surface: rgba(20, 27, 31, 0.6); /* Translucent / Frosted Glass */
+  --color-surface-solid: #141b1f; /* Solid surface */
+  --color-surface-hover: rgba(30, 41, 48, 0.8);
+
+  /* Borders */
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-border-active: #38bdf8; /* Sky Blue */
+
+  /* Accents */
+  --color-primary: #38bdf8; /* Sky Blue */
+  --color-primary-dim: rgba(56, 189, 248, 0.2);
+  --color-key: #10b981; /* Emerald */
+  --color-key-dim: rgba(16, 185, 129, 0.2);
+  --color-fk: #38bdf8; /* Sky Blue */
+  --color-fk-dim: rgba(56, 189, 248, 0.2);
+  --color-danger: #f87171;
+
+  /* Typography */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-base);
+  color: #f1f5f9;
+  font-family: var(--font-sans);
+  overflow: hidden;
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: var(--color-surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border);
+}
+
+.glass-panel-solid {
+  background: var(--color-surface-solid);
+  border: 1px solid var(--color-border);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Specific React Flow overrides for Dark Mode */
+.react-flow__node {
+  border-radius: 8px;
+}
+.react-flow__handle {
+  background-color: var(--color-base);
+  border: 2px solid var(--color-border);
+  width: 8px;
+  height: 8px;
+}
+.react-flow__handle.connectable {
+  cursor: crosshair;
+}
+
+/* React Flow Controls Styling */
+.react-flow__controls {
+  background-color: var(--color-surface-solid) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.react-flow__controls-button {
+  background-color: transparent !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  color: #f1f5f9 !important;
+  fill: #f1f5f9 !important;
+  transition: all 0.2s ease;
+}
+
+.react-flow__controls-button:hover {
+  background-color: rgba(56, 189, 248, 0.1) !important;
+  color: var(--color-primary) !important;
+  fill: var(--color-primary) !important;
+}
+
+.react-flow__controls-button:last-child {
+  border-bottom: none !important;
+}
