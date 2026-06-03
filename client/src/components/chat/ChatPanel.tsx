@@ -123,7 +123,7 @@ function ChatPanel({ onApplySchema }: Props) {
 
                 {loading && (
                     <div className="flex items-center gap-3 text-slate-400 text-sm animate-pulse ml-2 mb-6">
-                        <Sparkles className="w-4 h-4" /> Thinking...
+                        <Sparkles className="w-4 h-4" /> Cooking...
                     </div>
                 )}
 

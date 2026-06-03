@@ -1,4 +1,5 @@
 faker
 fastapi
 pydantic
-google-generativeai
+python-dotenv
+google-genai
