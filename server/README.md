@@ -3,10 +3,9 @@
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
 ![Pydantic](https://img.shields.io/badge/Pydantic-E92063?logo=pydantic&logoColor=white)
-![Faker](https://img.shields.io/badge/Faker-Data_Generation-blue)
 ![Google Gemini](https://img.shields.io/badge/Google_Gemini-AI-4285F4?logo=google&logoColor=white)
 
-The backend for GeneratorX, built with **Python**, **FastAPI**, **Pydantic**, and **Faker**.
+The backend for GeneratorX, built with **Python 3.10+**, **FastAPI**, **Pydantic**, and the **Google GenAI SDK** for AI-assisted relational database schema generation.
 
 ---
 
@@ -18,6 +17,8 @@ The backend for GeneratorX, built with **Python**, **FastAPI**, **Pydantic**, an
 
 ### Installation
 
+Create a virtual environment and install the required dependencies:
+
 ```bash
 python -m venv venv
 venv\Scripts\activate        # Windows
@@ -25,16 +26,31 @@ venv\Scripts\activate        # Windows
 pip install -r requirements.txt
 ```
 
+### Environment Configuration
+
+The AI schema assistant requires a Google Gemini API Key. 
+
+1. Obtain a key from [Google AI Studio](https://aistudio.google.com/).
+2. Create a `.env` file in the root of the `server/` directory:
+
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
 ### Start the API Server
+
+Run the FastAPI application locally using Uvicorn:
 
 ```bash
 uvicorn app:app --reload
 ```
 
 The server starts at **http://127.0.0.1:8000**.
-Interactive API docs (Swagger UI) are available at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
+Interactive API documentation (Swagger UI) is available at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
 
-### CLI Usage (Single Table)
+### CLI Usage (Single Table Mode)
+
+Generate CSV data directly from the terminal:
 
 ```bash
 python main.py schema.json output.csv
@@ -46,40 +62,51 @@ python main.py schema.json output.csv
 
 ```
 server/
-├── app.py                         → FastAPI app & REST endpoints
+├── app.py                         → FastAPI web server & REST endpoints
 ├── main.py                        → CLI entry point (single-table mode)
-├── requirements.txt               → Python dependencies
-├── schema.json                    → Example single-table schema
-├── test_all_types_schema.json     → Example schema with all column types
+├── requirements.txt               → Python package dependencies
+├── schema.json                    → Example schema (single-table)
+├── test_all_types_schema.json     → Example schema using all column types
+├── ai/
+│   └── schema_generator.py        → Google Gemini AI schema generator implementation
 ├── generator/
-│   ├── engine.py                  → Core dataset generation engine
-│   ├── types.py                   → Faker-based value generators per column type
-│   └── dependency.py              → Topological sort for table dependency ordering
+│   ├── engine.py                  → Core multi-table Faker generation engine
+│   ├── types.py                   → Faker generator maps for all column types
+│   └── dependency.py              → Dependency sorting (Kahn's Topological Sort)
 ├── schemas/
-│   └── schema_models.py           → Pydantic validation models
+│   └── schema_models.py           → Pydantic validation schemas
 └── exporters/
-    ├── csv_exporter.py            → Converts table rows → CSV buffer
-    └── zip_exporter.py            → Bundles multiple CSVs into a ZIP archive
+    ├── csv_exporter.py            → Conversions to CSV string buffers
+    └── zip_exporter.py            → Packaging CSV files into a ZIP archive
 ```
 
 ---
 
 ## 📡 API Endpoints
 
-| Method | Endpoint         | Description                                      |
-|--------|------------------|--------------------------------------------------|
-| GET    | `/`              | App info and version                             |
-| POST   | `/generate`      | Generate dataset → JSON response                 |
-| POST   | `/generate/zip`  | Generate dataset → ZIP download (CSVs inside)    |
+| Method | Endpoint               | Description                                      |
+|--------|------------------------|--------------------------------------------------|
+| GET    | `/`                    | Server metadata (name, description, version)     |
+| POST   | `/generate`            | Accepts a JSON schema → Returns generated dataset JSON |
+| POST   | `/generate/zip`        | Accepts a JSON schema → Returns generated tables ZIP file |
+| POST   | `/generate/ai-schema`  | Accepts a text prompt → Returns AI-generated schema JSON |
 
-### Example — `POST /generate`
+### Example — `POST /generate/ai-schema`
 
+Payload:
+```json
+{
+  "prompt": "Create a gym workout database containing users, exercises, and logs"
+}
+```
+
+Response:
 ```json
 {
   "tables": [
     {
       "table_name": "users",
-      "rows": 5,
+      "rows": 10,
       "columns": [
         { "name": "id", "type": "int", "min": 1, "max": 1000 },
         { "name": "name", "type": "full_name" },
@@ -87,12 +114,22 @@ server/
       ]
     },
     {
-      "table_name": "orders",
-      "rows": 10,
+      "table_name": "exercises",
+      "rows": 15,
       "columns": [
-        { "name": "order_id", "type": "int", "min": 1, "max": 9999 },
+        { "name": "id", "type": "int", "min": 1, "max": 500 },
+        { "name": "exercise_name", "type": "company" },
+        { "name": "description", "type": "paragraph" }
+      ]
+    },
+    {
+      "table_name": "logs",
+      "rows": 25,
+      "columns": [
+        { "name": "id", "type": "int", "min": 1, "max": 10000 },
         { "name": "user_id", "type": "int", "ref": { "table": "users", "column": "id" } },
-        { "name": "created_at", "type": "date" }
+        { "name": "exercise_id", "type": "int", "ref": { "table": "exercises", "column": "id" } },
+        { "name": "date_logged", "type": "date" }
       ]
     }
   ]
@@ -103,32 +140,34 @@ server/
 
 ## 📋 Supported Column Types
 
-| Type          | Description                 | Options             |
-|---------------|-----------------------------|---------------------|
-| `int`         | Random integer              | `min`, `max`        |
-| `full_name`   | Full person name            |                     |
-| `first_name`  | First name                  |                     |
-| `last_name`   | Last name                   |                     |
-| `email`       | Email address               | `unique`            |
-| `user_name`   | Username                    |                     |
-| `phone`       | Phone number                |                     |
-| `address`     | Full street address         |                     |
-| `city`        | City name                   |                     |
-| `country`     | Country name                |                     |
-| `zip_code`    | Postal / ZIP code           |                     |
-| `url`         | Website URL                 |                     |
-| `company`     | Company name                |                     |
-| `text`        | Random text block           |                     |
-| `paragraph`   | Random paragraph            |                     |
-| `date`        | Date (last 5 years)         |                     |
-| `uuid`        | UUID v4                     |                     |
-| `boolean`     | `true` / `false`            |                     |
+The mock generation engine currently supports the following column types:
+
+| Type          | Description                         | Options                    |
+|---------------|-------------------------------------|----------------------------|
+| `int`         | Random integer                      | `min`, `max` (required)    |
+| `full_name`   | Full name of a person               |                            |
+| `first_name`  | First name                          |                            |
+| `last_name`   | Last name                           |                            |
+| `email`       | Email address                       | `unique`                   |
+| `user_name`   | Username                            |                            |
+| `phone`       | Phone number                        |                            |
+| `address`     | Full street address                 |                            |
+| `city`        | City                                |                            |
+| `country`     | Country                             |                            |
+| `zip_code`    | Postal / Zip code                   |                            |
+| `url`         | Website URL                         |                            |
+| `company`     | Company name                        |                            |
+| `text`        | Short text block                    |                            |
+| `paragraph`   | Full paragraph text                 |                            |
+| `date`        | Date string (last 5 years)          |                            |
+| `uuid`        | Universally Unique Identifier (UUID)|                            |
+| `boolean`     | True / False                        |                            |
 
 ---
 
-## 🔗 Foreign Key References
+## 🔗 Foreign Key References & Topological Sorting
 
-Columns can reference another table's column using `ref`:
+Tables can establish relations by using the `ref` field. For instance, linking a child column to its parent column:
 
 ```json
 {
@@ -138,16 +177,18 @@ Columns can reference another table's column using `ref`:
 }
 ```
 
-Tables are automatically sorted using **topological ordering** (Kahn's algorithm) so parent tables are always generated first. Circular dependencies are detected and rejected.
+To ensure relational integrity during mock generation, the backend sorts tables in **topological order** using Kahn's algorithm. Circular references are automatically detected and will result in validation errors.
 
 ---
 
 ## 🛠️ Dependencies
 
-| Package    | Purpose                       |
-|------------|-------------------------------|
-| FastAPI    | Web framework & REST API      |
-| Uvicorn    | ASGI server                   |
-| Pydantic   | Schema validation             |
-| Faker      | Realistic fake data           |
-| Pandas     | Data utilities                |
+| Package         | Version / Range | Purpose                                                    |
+|-----------------|-----------------|------------------------------------------------------------|
+| FastAPI         | Latest          | Async Web API framework                                    |
+| Uvicorn         | Latest          | ASGI web server                                            |
+| Pydantic        | Latest          | Structured JSON schema validation                          |
+| Faker           | Latest          | Fake data generation providers                             |
+| Pandas          | Latest          | DataFrame handling for data formatting                     |
+| Google GenAI    | Latest          | Official SDK to connect to Gemini AI models                |
+| Python Dotenv   | Latest          | Loads environment configurations from `.env` files         |
