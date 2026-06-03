@@ -3,6 +3,8 @@ import { Code2, PenTool, Download, Plus } from "lucide-react";
 import SchemaCanvas from "./SchemaCanvas";
 import JsonSchemaEditor from "./JsonSchemaEditor";
 import EditSidebar from "./EditSidebar";
+import GithubInfoModal from "./GithubInfoModal";
+import Github from "../icons/Github";
 import type { Table, ExportFormat, Column } from "../../types/generator";
 
 interface Props {
@@ -21,6 +23,7 @@ type SchemaTab = "visual" | "json";
 function SchemaPanel({ tables, setTables, onGenerate, loading, format, onFormatChange }: Props) {
     const [activeTab, setActiveTab] = useState<SchemaTab>("visual");
     const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
+    const [isGithubModalOpen, setIsGithubModalOpen] = useState(false);
 
     // Satisfy TS compiler for unused props while format selector is commented out by user
     void format;
@@ -141,8 +144,16 @@ function SchemaPanel({ tables, setTables, onGenerate, loading, format, onFormatC
                 {/* Export Actions & Add Table */}
                 <div className="flex items-center gap-4">
                     <button
+                        onClick={() => setIsGithubModalOpen(true)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 bg-slate-800/40 border border-slate-700/30 hover:bg-slate-800 hover:text-white transition-colors cursor-pointer"
+                        title="About generatorX & Community"
+                    >
+                        <Github className="w-4 h-4" /> GitHub
+                    </button>
+
+                    <button
                         onClick={addTable}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 hover:bg-emerald-400/20 transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 hover:bg-emerald-400/20 transition-colors cursor-pointer"
                     >
                         <Plus className="w-4 h-4" /> Add Table
                     </button>
@@ -212,6 +223,12 @@ function SchemaPanel({ tables, setTables, onGenerate, loading, format, onFormatC
                     onRemoveColumn={removeColumn}
                 />
             </div>
+
+            {/* GitHub Information & Contribution Modal */}
+            <GithubInfoModal 
+                isOpen={isGithubModalOpen} 
+                onClose={() => setIsGithubModalOpen(false)} 
+            />
         </div>
     );
 }
