@@ -1,9 +1,12 @@
 from google import genai
 import os
 import json
+from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
+# Resolve the absolute path to the server directory's .env file
+env_path = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(dotenv_path=env_path)
 
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
